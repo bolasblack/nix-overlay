@@ -1,0 +1,11 @@
+--- a/pre_commit/resources/hook-tmpl
++++ b/pre_commit/resources/hook-tmpl
+@@ -27,6 +27,8 @@ ARGS.extend(sys.argv[1:])
+ DNE = '`pre-commit` not found.  Did you forget to activate your virtualenv?'
+ if os.access(INSTALL_PYTHON, os.X_OK):
+     CMD = [INSTALL_PYTHON, '-mpre_commit']
++elif os.path.isfile('@pre-commit@/bin/pre-commit') and os.access('@pre-commit@/bin/pre-commit', os.X_OK):
++    CMD = ['@pre-commit@/bin/pre-commit']
+ elif which('pre-commit'):
+     CMD = ['pre-commit']
+ else:
