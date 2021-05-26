@@ -10,4 +10,5 @@ in
 
 emacsOverlay // {
     pre-commit = callPackage ./pkgs/pre-commit {};
+    fn = callPackage ./pkgs/fn {};
 }
