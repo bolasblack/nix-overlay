@@ -1,37 +1,36 @@
-{ pkgs ? import <nixpkgs> {} }:
-
-with pkgs;
+{ lib, buildGoModule, fetchFromGitHub, docker }:
 
 buildGoModule rec {
   pname = "fn";
-  version = "0.5.99";
+  version = "0.6.6";
 
   name = "${pname}-${version}";
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Command-line tool for the fn project";
-    homepage = https://fnproject.io;
+    homepage = "https://fnproject.io";
     license = licenses.asl20;
     maintainers = [ "c4605" ];
-    platforms = platforms.windows
-             ++ platforms.linux
-             ++ platforms.darwin;
   };
 
   src = fetchFromGitHub {
     owner = "fnproject";
     repo = "cli";
     rev = "${version}";
-    sha256 = "0wkxlr6dhrf802fv4qk4b4l2c6hdnyllb8jm03xjzcif3z78m7yk";
+    sha256 = "12s3xgrr11n8kfwsh8xpwcza1pr6b200dmc9h8igjy3s3cgg6sh7";
   };
 
   vendorSha256 = null;
 
-  excludedPackages = ["test"];
+  subPackages = ["."];
 
-  buildInputs = with pkgs; [
+  buildInputs = [
     docker
   ];
+
+  preBuild = ''
+    export HOME=$TMPDIR
+  '';
 
   postInstall = ''
     mv $out/bin/cli $out/bin/fn
