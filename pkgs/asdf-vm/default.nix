@@ -1,16 +1,12 @@
-{ pkgs ? import <nixpkgs> {} }:
-
-with pkgs;
+{ stdenv, lib, fetchFromGitHub, makeWrapper, installShellFiles, bash, coreutils, curl, git }:
 
 stdenv.mkDerivation rec {
   pname = "asdf-vm";
-  version = "0.7.8";
+  version = "0.8.1";
 
-  name = "${pname}-${version}";
-
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Extendable version manager with support for Ruby, Node.js, Erlang & more";
-    homepage = https://asdf-vm.com/;
+    homepage = "https://asdf-vm.com/";
     license = licenses.mit;
     maintainers = [ "c4605" ];
     platforms = platforms.linux
@@ -21,27 +17,29 @@ stdenv.mkDerivation rec {
     owner = "asdf-vm";
     repo = "asdf";
     rev = "v${version}";
-    sha256 = "0cr9mnj9fy5riwn6wf4qmdqnjm8n3yxya5a4s4v5qq2wsmpclqc1";
+    sha256 = "07lh5k1krzm7fbkv0jlwbzz5ycn2jg7s12dnqwmy82qqic0sl6fl";
   };
 
-  nativeBuildInputs = with pkgs; [
+  nativeBuildInputs = [
     makeWrapper
     installShellFiles
   ];
 
-  buildInputs = with pkgs; [
+  buildInputs = [
     bash
-    coreutils
     curl
     git
   ];
 
   installPhase = ''
-    mkdir -p $out/asdf-vm
-    cp -r . $out/asdf-vm
+    mkdir -p $out/share/asdf-vm
+    cp -r . $out/share/asdf-vm
+
+    mkdir -p $out/etc/profile.d
+    echo "source $out/share/asdf-vm/asdf.sh" > $out/etc/profile.d/asdf.sh
 
     mkdir -p $out/bin
-    makeWrapper $out/asdf-vm/bin/asdf $out/bin/asdf --set ASDF_DIR $out/asdf-vm
+    makeWrapper $out/share/asdf-vm/bin/asdf $out/bin/asdf --set ASDF_DIR $out/share/asdf-vm
 
     installShellCompletion --zsh --name _asdf completions/_asdf
     installShellCompletion --fish --name asdf.fish completions/asdf.fish
