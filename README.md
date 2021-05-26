@@ -4,6 +4,7 @@
 
 * https://github.com/nix-community/emacs-overlay
 * [pre-commit](https://pre-commit.com/)
+* [asdf-vm](https://asdf-vm.com/)
 * [fn](https://fnproject.io/)
 
 ## How to install 
