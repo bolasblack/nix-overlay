@@ -12,5 +12,6 @@ emacsOverlay // {
     pre-commit = callPackage ./pkgs/pre-commit {};
     asdf-vm = callPackage ./pkgs/asdf-vm {};
     fn = callPackage ./pkgs/fn {};
+    graalvm11-ce = callPackage ./pkgs/graalvm {};
     babashka = callPackage ./pkgs/babashka {};
 }
