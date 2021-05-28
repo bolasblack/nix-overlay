@@ -1,17 +1,35 @@
-{ stdenv, lib, fetchFromGitHub, makeWrapper, installShellFiles, bash, coreutils, curl, git }:
+{ stdenv, lib, fetchFromGitHub, makeWrapper, installShellFiles, bash, coreutils, curl, git, writeScript }:
 
-stdenv.mkDerivation rec {
+let
+  asdfReshimFile = writeScript "asdf-reshim" ''
+#!/usr/bin/env bash
+
+# asdf-vm create "shim" file like this:
+#
+#    exec $ASDF_DIR/bin/asdf exec "node" "$@"
+#
+# So we should reshim all installed versions every time, because $out
+# always change
+
+asdfDataDir="''${ASDF_DATA_DIR:-$HOME/.asdf}"
+
+prevAsdfDirFilePath="$asdfDataDir/.nix-prev-asdf-dir-path"
+
+if [ -r "$prevAsdfDirFilePath" ]; then
+  prevAsdfDir="$(cat "$prevAsdfDirFilePath")"
+else
+  prevAsdfDir=""
+fi
+
+if [ "$prevAsdfDir" != "$ASDF_DIR" ]; then
+  rm -rf "$asdfDataDir"/shims
+  "$ASDF_DIR"/bin/asdf reshim
+  echo "$ASDF_DIR" > "$prevAsdfDirFilePath"
+fi
+  '';
+in stdenv.mkDerivation rec {
   pname = "asdf-vm";
   version = "0.8.1";
-
-  meta = with lib; {
-    description = "Extendable version manager with support for Ruby, Node.js, Erlang & more";
-    homepage = "https://asdf-vm.com/";
-    license = licenses.mit;
-    maintainers = [ "c4605" ];
-    platforms = platforms.linux
-             ++ platforms.darwin;
-  };
 
   src = fetchFromGitHub {
     owner = "asdf-vm";
@@ -39,10 +57,21 @@ stdenv.mkDerivation rec {
     echo "source $out/share/asdf-vm/asdf.sh" > $out/etc/profile.d/asdf.sh
 
     mkdir -p $out/bin
-    makeWrapper $out/share/asdf-vm/bin/asdf $out/bin/asdf --set ASDF_DIR $out/share/asdf-vm
+    makeWrapper $out/share/asdf-vm/bin/asdf $out/bin/asdf \
+      --set ASDF_DIR $out/share/asdf-vm \
+      --run "${asdfReshimFile}"
 
-    installShellCompletion --zsh --name _asdf completions/_asdf
-    installShellCompletion --fish --name asdf.fish completions/asdf.fish
-    installShellCompletion --bash --name asdf.bash completions/asdf.bash
+    installShellCompletion --cmd asdf \
+      --zsh completions/_asdf \
+      --fish completions/asdf.fish \
+      --bash completions/asdf.bash
   '';
+
+  meta = with lib; {
+    description = "Extendable version manager with support for Ruby, Node.js, Erlang & more";
+    homepage = "https://asdf-vm.com/";
+    license = licenses.mit;
+    maintainers = [ "c4605" ];
+    platforms = platforms.unix;
+  };
 }
