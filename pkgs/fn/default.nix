@@ -4,19 +4,10 @@ buildGoModule rec {
   pname = "fn";
   version = "0.6.6";
 
-  name = "${pname}-${version}";
-
-  meta = with lib; {
-    description = "Command-line tool for the fn project";
-    homepage = "https://fnproject.io";
-    license = licenses.asl20;
-    maintainers = [ "c4605" ];
-  };
-
   src = fetchFromGitHub {
     owner = "fnproject";
     repo = "cli";
-    rev = "${version}";
+    rev = version;
     sha256 = "12s3xgrr11n8kfwsh8xpwcza1pr6b200dmc9h8igjy3s3cgg6sh7";
   };
 
@@ -35,4 +26,11 @@ buildGoModule rec {
   postInstall = ''
     mv $out/bin/cli $out/bin/fn
   '';
+
+  meta = with lib; {
+    description = "Command-line tool for the fn project";
+    homepage = "https://fnproject.io";
+    license = licenses.asl20;
+    maintainers = [ maintainers.c4605 ];
+  };
 }
