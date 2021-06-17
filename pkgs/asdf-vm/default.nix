@@ -8,9 +8,10 @@ let
 #
 #    exec $ASDF_DIR/bin/asdf exec "node" "$@"
 #
-# So we should reshim all installed versions every time, because $out
-# always change
+# So we should reshim all installed versions every time shell initialized,
+# because $out always change
 
+asdfDir="''${ASDF_DIR:-$HOME/.asdf}"
 asdfDataDir="''${ASDF_DATA_DIR:-$HOME/.asdf}"
 
 prevAsdfDirFilePath="$asdfDataDir/.nix-prev-asdf-dir-path"
@@ -21,11 +22,18 @@ else
   prevAsdfDir=""
 fi
 
-if [ "$prevAsdfDir" != "$ASDF_DIR" ]; then
+if [ "$prevAsdfDir" != "$asdfDir" ]; then
   rm -rf "$asdfDataDir"/shims
-  "$ASDF_DIR"/bin/asdf reshim
-  echo "$ASDF_DIR" > "$prevAsdfDirFilePath"
+  "$asdfDir"/bin/asdf reshim
+  echo "$asdfDir" > "$prevAsdfDirFilePath"
 fi
+  '';
+
+  asdfPrepareFile = writeScript "asdf-prepare" ''
+ASDF_DIR="@asdfDir@"
+
+source "$ASDF_DIR/asdf.sh"
+${asdfReshimFile}
   '';
 in stdenv.mkDerivation rec {
   pname = "asdf-vm";
@@ -54,12 +62,12 @@ in stdenv.mkDerivation rec {
     cp -r . $out/share/asdf-vm
 
     mkdir -p $out/etc/profile.d
-    echo "source $out/share/asdf-vm/asdf.sh" > $out/etc/profile.d/asdf.sh
+    substitute ${asdfPrepareFile} $out/etc/profile.d/asdf-prepare.sh \
+      --replace "@asdfDir@" "$out/share/asdf-vm"
 
     mkdir -p $out/bin
     makeWrapper $out/share/asdf-vm/bin/asdf $out/bin/asdf \
-      --set ASDF_DIR $out/share/asdf-vm \
-      --run "${asdfReshimFile}"
+      --set ASDF_DIR $out/share/asdf-vm
 
     installShellCompletion --cmd asdf \
       --zsh completions/_asdf \
