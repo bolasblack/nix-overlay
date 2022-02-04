@@ -3,9 +3,9 @@ final: prev:
 let
   callPackage = prev.lib.callPackageWith prev;
 in {
-  pre-commit = callPackage ./pkgs/pre-commit {};
-  asdf-vm = callPackage ./pkgs/asdf-vm {};
-  fn = callPackage ./pkgs/fn {};
-  graalvm11-ce = callPackage ./pkgs/graalvm {};
-  babashka = callPackage ./pkgs/babashka {};
+  asdf-vm-c4 = callPackage ./pkgs/asdf-vm {};
+  fn-cli-c4 = callPackage ./pkgs/fn {};
+  pre-commit-c4 = callPackage ./pkgs/pre-commit {};
+  graalvm11-ce-c4 = callPackage ./pkgs/graalvm {};
+  babashka-c4 = callPackage ./pkgs/babashka {};
 }

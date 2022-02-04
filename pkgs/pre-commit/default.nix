@@ -1,7 +1,6 @@
 { pkgs }:
 
 with pkgs;
-with pkgs.python38Packages;
 
 pre-commit.overridePythonAttrs(oldAttrs: rec {
   version = "2.13.0";
