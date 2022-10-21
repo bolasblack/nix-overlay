@@ -1,30 +1,36 @@
-{ lib, buildGoModule, fetchFromGitHub, docker }:
+{ lib, stdenv, fetchurl }:
 
-buildGoModule rec {
-  pname = "fn";
-  version = "0.6.6";
+let
+  version = "0.6.22";
 
-  src = fetchFromGitHub {
-    owner = "fnproject";
-    repo = "cli";
-    rev = version;
-    sha256 = "12s3xgrr11n8kfwsh8xpwcza1pr6b200dmc9h8igjy3s3cgg6sh7";
-  };
+  binPath =
+    if stdenv.isDarwin then
+      fetchurl {
+        url = "https://github.com/fnproject/cli/releases/download/${version}/fn_mac";
+        sha256 = "1c9k8drazy2p9hwf3jmd1b847m4inw1klrivx6y1dhw8p9m4hwvs";
+      }
+    else
+      fetchurl {
+        url = "https://github.com/fnproject/cli/releases/download/${version}/fn_linux";
+        sha256 = "0z5140jqm4p7rwyzr459jlw4aad53yrc4nzvsj26af5mmwib8h3a";
+      };
 
-  vendorSha256 = null;
+in
 
-  subPackages = ["."];
+stdenv.mkDerivation rec {
+  pname = "fn-cli";
+  inherit version;
 
-  buildInputs = [
-    docker
-  ];
+  dontUnpack = true;
 
-  preBuild = ''
-    export HOME=$TMPDIR
-  '';
+  installPhase = ''
+runHook preInstall
 
-  postInstall = ''
-    mv $out/bin/cli $out/bin/fn
+mkdir -p $out/bin
+cp ${binPath} $out/bin/fn
+chmod u+x $out/bin/fn
+
+runHook postInstall
   '';
 
   meta = with lib; {
@@ -34,3 +40,4 @@ buildGoModule rec {
     maintainers = [ maintainers.c4605 ];
   };
 }
+
