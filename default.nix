@@ -9,4 +9,5 @@ in {
   pre-commit-c4 = callPackage ./pkgs/pre-commit {};
   graalvm11-ce-c4 = callPackage ./pkgs/graalvm {};
   babashka-c4 = callPackage ./pkgs/babashka {};
+  rclone-c4 = callPackage ./pkgs/rclone {};
 }

@@ -31,12 +31,19 @@ now you can install the packages from the overlay
         <package>
     ];
 
+## Development tips
 
-## How to check builds
+### How to check builds
 
     nix-build -E 'with import <nixpkgs> {} ; callPackage ./default.nix {}';
 
 should create a `./result` folder which contains the result of the package.
+
+### How to get a sha256 hash
+
+```bash
+nix-shell -p nix-prefetch --run "nix-prefetch fetchurl --urls --expr '[ <file download url> ]'"
+```
 
 # Links
 
