@@ -1,7 +1,7 @@
 {
   description = "c4605's overlay";
 
-  outputs = { self, nixpkgs, ... }@inputs: {
+  outputs = { self, ... }@inputs: {
     overlay = import ./default.nix;
   };
 }

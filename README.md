@@ -35,7 +35,9 @@ now you can install the packages from the overlay
 
 ### How to check builds
 
-    nix-build -E 'with import <nixpkgs> {} ; callPackage ./default.nix {}';
+```bash
+nix-build -E 'with import <nixpkgs> {} ; callPackage ./default.nix {}';
+```
 
 should create a `./result` folder which contains the result of the package.
 
