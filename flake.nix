@@ -27,6 +27,11 @@
       {
         devShells.default = pkgs.mkShell {
           packages = builtins.attrValues (self.overlay pkgs pkgs);
+          shellHook = ''
+            if command -v zsh > /dev/null; then
+              exec zsh
+            fi
+          '';
         };
       }
     );
